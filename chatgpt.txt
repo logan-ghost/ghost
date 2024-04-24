@@ -1,0 +1,37 @@
+from robocore import RoboCore
+
+# Inicialização do RoboCore
+robocore = RoboCore()
+
+# Definição das velocidades dos motores
+motor_left_speed = 100
+motor_right_speed = 100
+
+# Definição do tempo para o robô se mover para frente (em segundos)
+tempo_movimento_frente = 2
+
+# Definição do tempo para o robô girar (em segundos)
+tempo_girar = 1
+
+# Função para fazer o robô se mover para frente
+def mover_para_frente():
+    robocore.set_motor_speeds(motor_left_speed, motor_right_speed)
+    robocore.sleep(tempo_movimento_frente)
+
+# Função para fazer o robô girar para a direita
+def girar_para_direita():
+    robocore.set_motor_speeds(motor_left_speed, -motor_right_speed)
+    robocore.sleep(tempo_girar)
+
+# Função principal
+def main():
+    while True:
+        # Faz o robô se mover para frente
+        mover_para_frente()
+        
+        # Faz o robô girar para a direita
+        girar_para_direita()
+
+# Execução do programa principal
+if __name__ == "__main__":
+    main()

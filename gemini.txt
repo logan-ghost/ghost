@@ -1,0 +1,75 @@
+import robocode.*;
+
+public class RoboAgressivo extends AdvancedRobot {
+
+    // Variável para armazenar a energia do robô
+    private double energia;
+
+    // Variável para armazenar a distância do último robô inimigo detectado
+    private double distanciaInimigo;
+
+    // Método inicial do robô
+    public void run() {
+        // Ajusta o radar para ter um alcance de 360 graus
+        setAdjustRadarScan(true);
+        // Ajusta o canhão para girar junto com o radar
+        setTurnGunRightRadians(getGunHeadingRadians() + 1.0);
+
+        // Loop principal do robô
+        while (true) {
+            // Verifica se o robô tem energia suficiente para atirar
+            if (getEnergy() > 0.5) {
+                // Atira no último robô inimigo detectado, se estiver dentro do alcance
+                if (distanciaInimigo < getGunRange()) {
+                    fire(getEnergy() * 0.5);
+                } else {
+                    // Se o inimigo estiver fora de alcance, gira o canhão para ele
+                    turnGunRightRadians(getHeadingRadians() - getGunHeadingRadians() + Math.atan2(getY() - getEnemyY(), getX() - getEnemyX()));
+                }
+            }
+
+            // Verifica se o radar detectou algum robô inimigo
+            if (getRadarDistance() > 0) {
+                // Atualiza a variável com a distância do robô inimigo
+                distanciaInimigo = getRadarDistance();
+
+                // Se o inimigo estiver próximo, move o robô em direção a ele
+                if (distanciaInimigo < 100) {
+                    ahead(distanciaInimigo);
+                } else {
+                    // Se o inimigo estiver mais longe, gira o corpo do robô em direção a ele
+                    turnRightRadians(getHeadingRadians() - getBodyHeadingRadians() + Math.atan2(getY() - getEnemyY(), getX() - getEnemyX()));
+                }
+            } else {
+                // Se nenhum inimigo for detectado, gira o radar para procurar
+                turnRadarRight(360);
+            }
+
+            // Executa as ações do robô
+            execute();
+        }
+    }
+
+    // Método chamado quando o robô colide com outro robô
+    public void onHitRobot(HitRobotEvent e) {
+        // Ajusta o corpo do robô para ficar de frente para o robô inimigo
+        turnRightRadians(getHeadingRadians() - getBodyHeadingRadians() + Math.atan2(e.getHitX() - getY(), e.getHitY() - getX()));
+
+        // Atira no robô inimigo
+        fire(getEnergy());
+    }
+
+    // Método chamado quando o robô recebe um tiro de outro robô
+    public void onScannedRobot(ScannedRobotEvent e) {
+        // Atualiza a variável com a distância do robô inimigo
+        distanciaInimigo = e.getDistance();
+
+        // Se o inimigo estiver próximo, move o robô em direção a ele
+        if (distanciaInimigo < 100) {
+            ahead(distanciaInimigo);
+        } else {
+            // Se o inimigo estiver mais longe, gira o corpo do robô em direção a ele
+            turnRightRadians(getHeadingRadians() - getBodyHeadingRadians() + Math.atan2(e.getY() - getY(), e.getX() - getX()));
+        }
+    }
+}
